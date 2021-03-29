@@ -29,11 +29,26 @@ func main() {
 	}
 	defer conn.Close()
 
+	buff := make([]byte, 1000)
+	buffCo := make([]byte, 1000)
+	str := ""
+
+	conn.Write([]byte("Client - CONNEXION OK"))
 	fmt.Println("-------------------------")
 	fmt.Printf("Connected on : %s\n\n", name)
 
-	buff := make([]byte, 1000)
-	str := ""
+	for {
+		n, err := conn.Read(buffCo)
+		fmt.Println(string(buffCo))
+		if err != nil {
+			fmt.Println("ERROR")
+			continue
+		}
+		if string(buffCo[:n]) == "Serveur - CONNEXION OK" {
+			break
+		}
+	}
+
 	for /*z := 0; z < 10; z++*/ {
 		fmt.Println("-------------------------")
 		s := "OK"
@@ -54,5 +69,5 @@ func main() {
 		fmt.Println("-------------------------")
 	}
 	//convertBytesToFile("packet.jpeg", []byte(str), 0644)
-	convertBytesToFile("packet.pdf", []byte(str), 0644)
+	convertBytesToFile("packet.jpeg", []byte(str), 0644)
 }
