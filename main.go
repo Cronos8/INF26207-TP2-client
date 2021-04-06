@@ -11,6 +11,14 @@ import (
 	"os"
 )
 
+// HeaderPacket header of packet
+type HeaderPacket struct {
+	HeaderIp       net.IP // 16 byte -> 128 octets
+	HeaderPort     int32  // 4 byte -> 32 octets
+	HeaderNbPacket uint64 // 8 byte -> 64 octets
+	// // 28 bytes au total
+}
+
 func isDuplicatePacket(packetMap map[uint64]int, nbPacket uint64) bool {
 	if packetMap[nbPacket] == 1 {
 		return true
@@ -19,12 +27,32 @@ func isDuplicatePacket(packetMap map[uint64]int, nbPacket uint64) bool {
 	return false
 }
 
-func decapPacket(packet []byte) (uint64, []byte) {
+func decapPacket2(packet []byte) (uint64, []byte) {
 	buffnbpacket := packet[:8]
 	buffbody := packet[8:]
 	nbPacket := binary.LittleEndian.Uint64(buffnbpacket)
 
 	return nbPacket, buffbody
+}
+
+func decapPacket(packet []byte) (HeaderPacket, []byte) {
+
+	buffnbpacket := packet[:8]
+	nbPacket := binary.LittleEndian.Uint64(buffnbpacket)
+
+	buffipacket := packet[8:24]
+
+	buffportpacket := packet[24:28]
+	nbPort := binary.LittleEndian.Uint32(buffportpacket)
+
+	hpacket := HeaderPacket{
+		net.IP(buffipacket),
+		int32(nbPort),
+		nbPacket,
+	}
+	buffbody := packet[28:]
+
+	return hpacket, buffbody
 }
 
 func getFileByteSignature(fileByte []byte) {
@@ -71,6 +99,7 @@ func newServerConnexion(conn net.Conn) int {
 }
 
 func main() {
+
 	if len(os.Args) != 2 {
 		fmt.Fprintf(os.Stderr, "Usage: %s ip-addr\n", os.Args[0])
 		os.Exit(1)
@@ -110,17 +139,17 @@ func main() {
 						fmt.Println("END")
 						break
 					}
-					nbPacket, buffbody := decapPacket(buff[:n])
+					hpacket, buffbody := decapPacket(buff[:n])
 
-					if isDuplicatePacket(packetMap, nbPacket) == false {
+					if isDuplicatePacket(packetMap, hpacket.HeaderNbPacket) == false {
 						str = str + string(buffbody)
 					} else {
-						log.Printf("Packet nb : %v DUPLICATE\n", nbPacket)
+						log.Printf("Packet nb : %v DUPLICATE\n", hpacket.HeaderNbPacket)
 					}
 
 					conn.Write([]byte("PACKAGE RECEIVE"))
 					log.Printf("Send: %s\n", "PACKAGE RECEIVE")
-					log.Printf("Package nb : %v\n", nbPacket)
+					log.Printf("Package nb : %v\n", hpacket.HeaderNbPacket)
 					getByteSignature(buffbody)
 
 					fmt.Println("-------------------------")
