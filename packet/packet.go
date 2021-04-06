@@ -2,7 +2,25 @@ package packet
 
 import (
 	"encoding/binary"
+	"fmt"
+	"log"
 	"net"
+	"strconv"
+
+	"github.com/Cronos8/INF26207-TP2-client/filebyte"
+)
+
+// ColorPrint colors print
+type ColorPrint string
+
+const (
+	BlueColor   ColorPrint = "\033[34m"
+	RedColor    ColorPrint = "\033[31m"
+	GreenColor  ColorPrint = "\033[32m"
+	ResetColor  ColorPrint = "\033[0m"
+	YellowColor ColorPrint = "\033[33m"
+	CyanColor   ColorPrint = "\033[36m"
+	PurpleColor ColorPrint = "\033[35m"
 )
 
 // HeaderPacket header of packet
@@ -47,4 +65,39 @@ func DecapPacket(packet []byte) (HeaderPacket, []byte) {
 	buffbody := packet[28:]
 
 	return hpacket, buffbody
+}
+
+func PrintMessage(message string, color ColorPrint, ipsource string) {
+	fmt.Println(string(color))
+	fmt.Println("-----------------------------------------")
+	log.Println(message)
+	fmt.Println("Serveur addr : " + ipsource)
+	fmt.Println("-----------------------------------------")
+	fmt.Println(string(ResetColor))
+}
+
+// PrintMessageWithHeader print a message
+func PrintMessageWithHeader(message string, color ColorPrint, info HeaderPacket) {
+	fmt.Println(string(color))
+	fmt.Println("-----------------------------------------")
+	log.Println(message)
+	fmt.Println("Serveur addr : " + info.HeaderIp.String() + ":" + strconv.Itoa(int(info.HeaderPort)))
+	fmt.Println("-----------------------------------------")
+	fmt.Println(string(ResetColor))
+}
+
+// PrintPacket print a packet
+func PrintPacket(p []byte) {
+
+	hpacket, bodyPacket := DecapPacket(p)
+
+	fmt.Printf("\t************************************************\n")
+	fmt.Println()
+
+	fmt.Printf("\t[Packet N° : %v]\n", hpacket.HeaderNbPacket)
+	fmt.Printf("\tSignature : %x\n", filebyte.GetByteSignature(p))
+	fmt.Printf("\tBody Packet - Signature : %x\n", filebyte.GetByteSignature(bodyPacket))
+
+	fmt.Println()
+	fmt.Printf("\t************************************************\n")
 }

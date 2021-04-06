@@ -22,7 +22,7 @@ func NewServerConnexion(conn net.Conn) int {
 		n, err := conn.Read(buffCo)
 		fmt.Println(string(buffCo))
 		if err != nil {
-			fmt.Println("ERROR")
+			fmt.Printf("ERROR : %s\n", err)
 			continue
 		}
 		if string(buffCo[:n]) == "Serveur - CONNEXION OK" {

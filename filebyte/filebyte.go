@@ -4,16 +4,16 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 )
 
 func GetFileByteSignature(fileByte []byte) {
-	fmt.Printf("File signature : %x\n", sha1.Sum(fileByte))
+	fmt.Printf("File signature : %x\n\n", sha1.Sum(fileByte))
 }
 
-func GetByteSignature(packet []byte) {
-	log.Printf("Packet signature : %x\n", sha1.Sum(packet))
+// GetByteSignature
+func GetByteSignature(packet []byte) [20]byte {
+	return sha1.Sum(packet)
 }
 
 func ConvertBytesToFile(name string, bytesArr []byte, perm int) {
