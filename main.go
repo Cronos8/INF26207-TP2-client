@@ -11,33 +11,6 @@ import (
 	"github.com/Cronos8/INF26207-TP2-client/packet"
 )
 
-// func sendPaquetWithFiability(fiability float32) bool {
-// 	if rand.Float32() <= fiability {
-// 		return true
-// 	}
-// 	return false
-// }
-
-// func newServerConnexion(conn net.Conn) int {
-
-// 	buffCo := make([]byte, 1000)
-
-// 	for {
-// 		n, err := conn.Read(buffCo)
-// 		fmt.Println(string(buffCo))
-// 		if err != nil {
-// 			fmt.Println("ERROR")
-// 			continue
-// 		}
-// 		if string(buffCo[:n]) == "Serveur - CONNEXION OK" {
-// 			conn.Write([]byte("READY TO RECEIVE"))
-// 			log.Printf("Send: %s", "READY TO RECEIVE")
-// 			break
-// 		}
-// 	}
-// 	return 0
-// }
-
 func main() {
 
 	if len(os.Args) != 2 {
