@@ -52,9 +52,9 @@ func DecapPacket(packet []byte) (HeaderPacket, []byte) {
 	buffnbpacket := packet[:8]
 	nbPacket := binary.LittleEndian.Uint64(buffnbpacket)
 
-	buffipacket := packet[8:24]
+	buffipacket := packet[8:12]
 
-	buffportpacket := packet[24:28]
+	buffportpacket := packet[12:16]
 	nbPort := binary.LittleEndian.Uint32(buffportpacket)
 
 	hpacket := HeaderPacket{
@@ -62,7 +62,7 @@ func DecapPacket(packet []byte) (HeaderPacket, []byte) {
 		int32(nbPort),
 		nbPacket,
 	}
-	buffbody := packet[28:]
+	buffbody := packet[16:]
 
 	return hpacket, buffbody
 }
