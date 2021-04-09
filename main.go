@@ -12,6 +12,7 @@ import (
 
 func main() {
 
+	// Récupération des paramètres
 	if len(os.Args) != 3 {
 		fmt.Fprintf(os.Stderr, "Usage: %s ip-addr file-extension\n", os.Args[0])
 		fmt.Fprintf(os.Stderr, "Example: %s 127.0.0.1:22222 jpeg\n", os.Args[0])
@@ -23,6 +24,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Fatal error %s\n", err.Error())
 		os.Exit(1)
 	}
+	// Fermeture de la connexion à la fin
 	defer conn.Close()
 
 	buff := make([]byte, 1024)
@@ -38,29 +40,33 @@ func main() {
 
 	if clientfunc.NewServerConnexion(conn) == 0 {
 		for {
-			//fmt.Println("-------------------------")
 			n, err := conn.Read(buff)
 			if err != nil {
 				fmt.Println(err)
 				break
 			}
 
+			// Envoi de la réponse au serveur avec une fiabilité de 95%
 			if clientfunc.SendPaquetWithFiability(0.95) == true {
 				if n > 0 {
 
+					// Fin de transmission du fichier
 					if string(buff[:n]) == "END" {
 						packet.PrintMessage("END FILE TRANSMISSION", packet.PurpleColor, conn.RemoteAddr().String())
 						break
 					}
 
+					// Désencapsulation du paquet reçu
 					hpacket, buffbody := packet.DecapPacket(buff[:n])
 
+					// Vérification si le packet n'est pas dupliqué
 					if packet.IsDuplicatePacket(packetMap, hpacket.HeaderNbPacket) == false {
 						packet.PrintMessageWithHeader("Send : PACKAGE RECEIVE", packet.GreenColor, hpacket)
 						str = str + string(buffbody)
 					} else {
 						packet.PrintMessageWithHeader("Send : DUPLICATE PACKAGE", packet.YellowColor, hpacket)
 					}
+					// Envoi de l'accusé de réception du paquet
 					conn.Write([]byte("PACKAGE RECEIVE"))
 					packet.PrintPacket(buff[:n])
 
@@ -73,6 +79,8 @@ func main() {
 			}
 		}
 	}
+	// Conversion de la suite d'octets en fichier
 	filebyte.ConvertBytesToFile("packet."+os.Args[2], []byte(str), 0644)
+	// Affichage de la signature numérique du fichier
 	filebyte.GetFileByteSignature([]byte(str))
 }

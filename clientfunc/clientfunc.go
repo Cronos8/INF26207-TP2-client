@@ -7,6 +7,7 @@ import (
 	"net"
 )
 
+// SendPaquetWithFiability simule le pourcentage de fiabilité du client
 func SendPaquetWithFiability(fiability float32) bool {
 	if rand.Float32() <= fiability {
 		return true
@@ -14,6 +15,7 @@ func SendPaquetWithFiability(fiability float32) bool {
 	return false
 }
 
+// NewServerConnexion établit une connexion avec le serveur
 func NewServerConnexion(conn net.Conn) int {
 
 	buffCo := make([]byte, 1000)
