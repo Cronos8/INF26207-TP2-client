@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net"
+	"strings"
 )
 
 // SendPaquetWithFiability simule le pourcentage de fiabilité du client
@@ -13,6 +14,20 @@ func SendPaquetWithFiability(fiability float32) bool {
 		return true
 	}
 	return false
+}
+
+// SetFileName récupère le nom du fichier
+func SetFileName(conn net.Conn, buff []byte) string {
+	n, err := conn.Read(buff)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+	if strings.Contains(string(buff[:n]), "FILE ") {
+		conn.Write([]byte("PACKET RECEIVE"))
+		return strings.Fields(string(buff[:n]))[1]
+	}
+	return ""
 }
 
 // NewServerConnexion établit une connexion avec le serveur

@@ -13,9 +13,9 @@ import (
 func main() {
 
 	// Récupération des paramètres
-	if len(os.Args) != 3 {
-		fmt.Fprintf(os.Stderr, "Usage: %s ip-addr file-extension\n", os.Args[0])
-		fmt.Fprintf(os.Stderr, "Example: %s 127.0.0.1:22222 jpeg\n", os.Args[0])
+	if len(os.Args) != 2 {
+		fmt.Fprintf(os.Stderr, "Usage: %s ip-addr\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "Example: %s 127.0.0.1:22222\n", os.Args[0])
 		os.Exit(1)
 	}
 	name := os.Args[1]
@@ -30,6 +30,7 @@ func main() {
 	buff := make([]byte, 1024)
 	var packetMap map[uint64]int
 	packetMap = make(map[uint64]int)
+	var filename string = ""
 	str := ""
 
 	conn.Write([]byte("Client - CONNEXION OK"))
@@ -39,13 +40,14 @@ func main() {
 	fmt.Println("------------------------------------------------")
 
 	if clientfunc.NewServerConnexion(conn) == 0 {
+		// Initialise le nom du fichier
+		filename = clientfunc.SetFileName(conn, buff)
 		for {
 			n, err := conn.Read(buff)
 			if err != nil {
 				fmt.Println(err)
 				break
 			}
-
 			// Envoi de la réponse au serveur avec une fiabilité de 95%
 			if clientfunc.SendPaquetWithFiability(0.95) == true {
 				if n > 0 {
@@ -61,13 +63,13 @@ func main() {
 
 					// Vérification si le packet n'est pas dupliqué
 					if packet.IsDuplicatePacket(packetMap, hpacket.HeaderNbPacket) == false {
-						packet.PrintMessageWithHeader("Send : PACKAGE RECEIVE", packet.GreenColor, hpacket)
+						packet.PrintMessageWithHeader("Send : PACKET RECEIVE", packet.GreenColor, hpacket)
 						str = str + string(buffbody)
 					} else {
-						packet.PrintMessageWithHeader("Send : DUPLICATE PACKAGE", packet.YellowColor, hpacket)
+						packet.PrintMessageWithHeader("Send : DUPLICATE PACKET", packet.YellowColor, hpacket)
 					}
 					// Envoi de l'accusé de réception du paquet
-					conn.Write([]byte("PACKAGE RECEIVE"))
+					conn.Write([]byte("PACKET RECEIVE"))
 					packet.PrintPacket(buff[:n])
 
 				} else {
@@ -80,7 +82,7 @@ func main() {
 		}
 	}
 	// Conversion de la suite d'octets en fichier
-	filebyte.ConvertBytesToFile("packet."+os.Args[2], []byte(str), 0644)
+	filebyte.ConvertBytesToFile(filename, []byte(str), 0644)
 	// Affichage de la signature numérique du fichier
 	filebyte.GetFileByteSignature([]byte(str))
 }

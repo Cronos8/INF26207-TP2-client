@@ -20,11 +20,11 @@ Dans la racine du répertoire, exécuter la commande : ``go build .``.
 
 À la racine du répertoire :
 
-Exécuter la commande :``./INF26207-TP2-client IPServeur:PortServeur extensionFichier``
+Exécuter la commande :``./INF26207-TP2-client IPServeur:PortServeur``
 
-Exemple : ``./INF26207-TP2-client 127.0.0.1:22222 jpeg``
+Exemple : ``./INF26207-TP2-client 127.0.0.1:22222``
 
-Une fois la transmission de fichier terminé le fichier sera visible à la racine sous le nom de ``packet.extension``.
+Une fois la transmission de fichier terminé le fichier sera visible à la racine.
 
 ## Suppression de l'exécutable 
 
